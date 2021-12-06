@@ -4,16 +4,19 @@ fun main() {
     val size1 = readLine()!!.split(" ")
     val matrix1 = Matrix(size1[0].toInt(), size1[1].toInt())
     matrix1.fill()
-    val size2 = readLine()!!.split(" ")
-    val matrix2 = Matrix(size2[0].toInt(), size2[1].toInt())
-    matrix2.fill()
+    val mult = readLine()!!.toInt()
+    val result = matrix1 * mult
+    result.print()
+//    val size2 = readLine()!!.split(" ")
+//    val matrix2 = Matrix(size2[0].toInt(), size2[1].toInt())
+//    matrix2.fill()
 
-    try {
-        val matrix3 = matrix1 + matrix2
-        matrix3.array.forEach { i -> println(i.joinToString(" ")) }
-    } catch(e: Exception) {
-        println("ERROR")
-    }
+//    try {
+//        val matrix3 = matrix1 + matrix2
+//        matrix3.print()
+//    } catch(e: Exception) {
+//        println("ERROR")
+//    }
 
 }
 
@@ -46,5 +49,19 @@ class Matrix(_rows: Int, _cols: Int ) {
         } else {
             throw Exception("IncorrectSize")
         }
+    }
+
+    operator fun times(mult: Int): Matrix {
+        val result = Matrix(this.rows, this.cols)
+        for (i in 0 until rows) {
+            for (j in 0 until cols) {
+                result.array[i][j] = this.array[i][j] * mult
+            }
+        }
+        return result
+    }
+
+    fun print() {
+        this.array.forEach { i -> println(i.joinToString(" ")) }
     }
 }
