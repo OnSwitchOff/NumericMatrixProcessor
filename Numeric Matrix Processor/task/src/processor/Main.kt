@@ -1,11 +1,11 @@
 package processor
 
 import java.math.BigDecimal
+import kotlin.math.pow
+
 enum class TranspositionType {
     AlongMainDiagonal, AlongSideDiagonal, AlongVerticalLine, AlongHorizontalLine
 }
-
-
 
 fun main() {
     menu()
@@ -17,16 +17,28 @@ fun menu() {
         println("2. Multiply matrix by a constant")
         println("3. Multiply matrices")
         println("4. Transpose matrix")
+        println("5. Calculate a determinant")
         println("0. Exit")
         when (readLine()!!) {
             "1" -> addMatrices()
             "2" -> multiplyByConst()
             "3" -> multiplyMatrices()
             "4" -> transposeMatrix()
+            "5" -> getDeterminant()
             "0" -> return
         }
     }
 
+}
+
+fun getDeterminant() {
+    println("Enter matrix size:")
+    val size1 = readLine()!!.split(" ")
+    val matrix1 = Matrix(size1[0].toInt(), size1[1].toInt())
+    println("Enter matrix:")
+    matrix1.fill()
+    println("The result is:")
+    println(Matrix.calcDeterminant(matrix1))
 }
 
 fun transposeMatrix() {
@@ -215,7 +227,41 @@ class Matrix(_rows: Int, _cols: Int ) {
         return result
     }
 
+    fun getMinor(row: Int, col: Int): Matrix {
+        if (row < rows && col < cols){
+            val result = Matrix(this.rows - 1, this.cols - 1)
+            for (i in 0 until rows) {
+                for (j in 0 until cols) {
+                    if (i != row && j != col) {
+                        val newRow = if (i > row) i - 1 else i
+                        val newCol = if (j > col) j - 1 else j
+                        result.array[newRow][newCol] = this.array[i][j]
+                    }
+                }
+            }
+            return result
+        } else {
+            throw Exception("IncorrectIndex")
+        }
+    }
+
+
     fun print() {
         this.array.forEach { i -> println(i.joinToString(" ")) }
+    }
+
+    companion object {
+        fun calcDeterminant(matrix: Matrix): BigDecimal {
+            return if (matrix.rows == 2 && matrix.cols == 2) {
+                matrix.array[0][0] * matrix.array[1][1] - matrix.array[0][1] * matrix.array[1][0]
+            } else {
+                var result = 0.toBigDecimal()
+                val i = 0
+                for (j in 0 until matrix.cols) {
+                    result += matrix.array[i][j] * (((-1).toDouble()).pow((i + j).toDouble())).toBigDecimal() * calcDeterminant(matrix.getMinor(i,j))
+                }
+                result
+            }
+        }
     }
 }
