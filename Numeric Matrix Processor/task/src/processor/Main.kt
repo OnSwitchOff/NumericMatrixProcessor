@@ -1,7 +1,6 @@
 package processor
 
 import java.math.BigDecimal
-import java.math.MathContext
 import java.math.RoundingMode
 import kotlin.math.pow
 
@@ -142,10 +141,10 @@ fun addMatrices() {
 class Matrix(_rows: Int, _cols: Int ) {
     val rows = _rows
     val cols = _cols
-    val array: MutableList<MutableList<BigDecimal>> = mutableListOf<MutableList<BigDecimal>>()
+    val array: MutableList<MutableList<BigDecimal>> = mutableListOf()
     init {
         for (i in 0 until rows) {
-            this.array.add(MutableList<BigDecimal>(cols){ 0.toBigDecimal() })
+            this.array.add(MutableList(cols){ 0.toBigDecimal() })
         }
     }
     fun fill() {
