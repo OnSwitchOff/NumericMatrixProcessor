@@ -1,6 +1,8 @@
 package processor
 
 import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 import kotlin.math.pow
 
 enum class TranspositionType {
@@ -18,6 +20,7 @@ fun menu() {
         println("3. Multiply matrices")
         println("4. Transpose matrix")
         println("5. Calculate a determinant")
+        println("6. Inverse matrix")
         println("0. Exit")
         when (readLine()!!) {
             "1" -> addMatrices()
@@ -25,10 +28,22 @@ fun menu() {
             "3" -> multiplyMatrices()
             "4" -> transposeMatrix()
             "5" -> getDeterminant()
+            "6" -> getInverseMatrix()
             "0" -> return
         }
     }
 
+}
+
+fun getInverseMatrix() {
+    println("Enter matrix size:")
+    val size1 = readLine()!!.split(" ")
+    val matrix1 = Matrix(size1[0].toInt(), size1[1].toInt())
+    println("Enter matrix:")
+    matrix1.fill()
+    println("The result is:")
+    val matrix3 = matrix1.inverse()
+    matrix3.print()
 }
 
 fun getDeterminant() {
@@ -65,7 +80,7 @@ fun transposeMatrix(type: TranspositionType) {
         TranspositionType.AlongSideDiagonal -> matrix1.sideDiagonalTransposition()
         TranspositionType.AlongVerticalLine -> matrix1.verticalLineTransposition()
         TranspositionType.AlongHorizontalLine -> matrix1.horizontalLineTransposition()
-        else -> throw Exception("Not Implemented type $type")
+        //else -> throw Exception("Not Implemented type $type")
     }
     println("The result is:")
     matrix3.print()
@@ -245,6 +260,32 @@ class Matrix(_rows: Int, _cols: Int ) {
         }
     }
 
+    fun inverse(): Matrix {
+        if (rows == cols) {
+            val det = calcDeterminant(this)
+            if (det != 0.toBigDecimal()) {
+                val minm = getMinorMatrix()
+                val tr = minm.mainDiagonalTransposition()
+                val k: BigDecimal = 1.toBigDecimal().divide(det, 20, RoundingMode.HALF_UP)
+                return tr * k
+            } else {
+                throw Exception("det - 0")
+            }
+        } else {
+            throw Exception("IncorrectIndex")
+        }
+    }
+
+    private fun getMinorMatrix(): Matrix {
+        val result = Matrix(this.rows, this.cols)
+        for (i in 0 until rows) {
+            for (j in 0 until cols) {
+                result.array[i][j] = calcDeterminant(getMinor(i,j)) * (((-1).toDouble()).pow((i + j).toDouble())).toBigDecimal()
+            }
+        }
+        return result
+    }
+
 
     fun print() {
         this.array.forEach { i -> println(i.joinToString(" ")) }
@@ -254,6 +295,8 @@ class Matrix(_rows: Int, _cols: Int ) {
         fun calcDeterminant(matrix: Matrix): BigDecimal {
             return if (matrix.rows == 2 && matrix.cols == 2) {
                 matrix.array[0][0] * matrix.array[1][1] - matrix.array[0][1] * matrix.array[1][0]
+            } else if (matrix.rows == 1 && matrix.cols == 1) {
+                matrix.array[0][0]
             } else {
                 var result = 0.toBigDecimal()
                 val i = 0
