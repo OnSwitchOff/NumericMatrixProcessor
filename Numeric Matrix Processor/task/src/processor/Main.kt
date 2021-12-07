@@ -1,6 +1,11 @@
 package processor
 
 import java.math.BigDecimal
+enum class TranspositionType {
+    AlongMainDiagonal, AlongSideDiagonal, AlongVerticalLine, AlongHorizontalLine
+}
+
+
 
 fun main() {
     menu()
@@ -11,15 +16,47 @@ fun menu() {
         println("1. Add matrices")
         println("2. Multiply matrix by a constant")
         println("3. Multiply matrices")
+        println("4. Transpose matrix")
         println("0. Exit")
         when (readLine()!!) {
             "1" -> addMatrices()
             "2" -> multiplyByConst()
             "3" -> multiplyMatrices()
+            "4" -> transposeMatrix()
             "0" -> return
         }
     }
 
+}
+
+fun transposeMatrix() {
+    println("1. Main diagonal")
+    println("2. Side diagonal")
+    println("3. Vertical line")
+    println("4. Horizontal line")
+    when (readLine()!!) {
+        "1" -> transposeMatrix(TranspositionType.AlongMainDiagonal)
+        "2" -> transposeMatrix(TranspositionType.AlongSideDiagonal)
+        "3" -> transposeMatrix(TranspositionType.AlongVerticalLine)
+        "4" -> transposeMatrix(TranspositionType.AlongHorizontalLine)
+    }
+}
+
+fun transposeMatrix(type: TranspositionType) {
+    println("Enter matrix size:")
+    val size1 = readLine()!!.split(" ")
+    val matrix1 = Matrix(size1[0].toInt(), size1[1].toInt())
+    println("Enter matrix:")
+    matrix1.fill()
+    val matrix3 = when(type) {
+        TranspositionType.AlongMainDiagonal -> matrix1.mainDiagonalTransposition()
+        TranspositionType.AlongSideDiagonal -> matrix1.sideDiagonalTransposition()
+        TranspositionType.AlongVerticalLine -> matrix1.verticalLineTransposition()
+        TranspositionType.AlongHorizontalLine -> matrix1.horizontalLineTransposition()
+        else -> throw Exception("Not Implemented type $type")
+    }
+    println("The result is:")
+    matrix3.print()
 }
 
 fun multiplyMatrices() {
@@ -125,6 +162,54 @@ class Matrix(_rows: Int, _cols: Int ) {
         for (i in 0 until rows) {
             for (j in 0 until cols) {
                 result.array[i][j] = this.array[i][j] * mult
+            }
+        }
+        return result
+    }
+
+    fun mainDiagonalTransposition(): Matrix {
+        if (this.rows == this.cols) {
+            val result = Matrix(this.rows, this.cols)
+            for (i in 0 until rows) {
+                for (j in 0 until cols) {
+                    result.array[i][j] = this.array[j][i]
+                }
+            }
+            return result
+        } else {
+            throw Exception("IncorrectSize")
+        }
+    }
+
+    fun sideDiagonalTransposition(): Matrix {
+        if (this.rows == this.cols) {
+            val result = Matrix(this.rows, this.cols)
+            for (i in 0 until rows) {
+                for (j in 0 until cols) {
+                    result.array[i][j] = this.array[this.cols - j - 1][this.rows - i - 1]
+                }
+            }
+            return result
+        } else {
+            throw Exception("IncorrectSize")
+        }
+    }
+
+    fun verticalLineTransposition(): Matrix {
+        val result = Matrix(this.rows, this.cols)
+        for (i in 0 until rows) {
+            for (j in 0 until cols) {
+                result.array[i][j] = this.array[i][this.cols - j - 1]
+            }
+        }
+        return result
+    }
+
+    fun horizontalLineTransposition(): Matrix {
+        val result = Matrix(this.rows, this.cols)
+        for (i in 0 until rows) {
+            for (j in 0 until cols) {
+                result.array[i][j] = this.array[this.rows - i - 1][j]
             }
         }
         return result
